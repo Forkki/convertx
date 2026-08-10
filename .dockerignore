@@ -1,0 +1,10 @@
+node_modules
+.next
+.git
+build
+out
+*.log
+dev.pid
+eng.traineddata
+.DS_Store
+*.tsbuildinfo
