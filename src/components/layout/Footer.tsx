@@ -61,7 +61,7 @@ export function Footer() {
           ))}
         </div>
         <div className="mt-12 flex flex-col items-start justify-between gap-3 border-t border-line pt-6 sm:flex-row sm:items-center">
-          <p className="text-[13px] text-faint">© {new Date().getFullYear()} ConvertX — {t.tagline}</p>
+          <p className="text-[13px] text-faint">© {new Date().getFullYear()} FConvert — {t.tagline}</p>
           <p className="flex items-center gap-1.5 text-[13px] text-faint">
             <ShieldCheck className="size-4 text-success" aria-hidden />
             {t.hero.secure}

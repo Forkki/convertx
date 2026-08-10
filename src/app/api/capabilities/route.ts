@@ -27,7 +27,7 @@ export async function GET() {
   }));
 
   return NextResponse.json({
-    name: "ConvertX",
+    name: "FConvert",
     version: "1.0.0",
     engines: getEngineStatusList(),
     formats,

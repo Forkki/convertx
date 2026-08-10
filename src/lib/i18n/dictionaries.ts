@@ -1,9 +1,9 @@
 export type Lang = "th" | "en";
 
 const en = {
-  brand: "ConvertX",
+  brand: "FConvert",
   tagline: "Convert Anything. Keep Everything.",
-  appName: "ConvertX — Universal File Converter",
+  appName: "FConvert — Universal File Converter",
 
   nav: {
     convert: "Convert",
@@ -341,22 +341,22 @@ const en = {
   },
 
   meta: {
-    homeTitle: "ConvertX — Convert every file in one place",
+    homeTitle: "FConvert — Convert every file in one place",
     homeDesc:
       "Convert any file — images, PDFs, documents, audio and video — at high quality in one place. Free, no account needed.",
-    toolsTitle: "All conversion tools — ConvertX",
+    toolsTitle: "All conversion tools — FConvert",
     toolsDesc: "Find every conversion tool in one place. Images, PDF, documents, audio and video.",
-    historyTitle: "Conversion history — ConvertX",
+    historyTitle: "Conversion history — FConvert",
     historyDesc: "Your recent conversions, stored privately on this device.",
-    pdfTitle: "PDF toolkit — ConvertX",
+    pdfTitle: "PDF toolkit — FConvert",
     pdfDesc: "Merge, split, compress, rotate, encrypt and convert PDF pages — all with real page previews.",
-    workspaceTitle: "Conversion workspace — ConvertX",
+    workspaceTitle: "Conversion workspace — FConvert",
     workspaceDesc: "Preview your file, choose quality, and convert in real time.",
-    privacyTitle: "Privacy policy — ConvertX",
-    privacyDesc: "How ConvertX handles your files and data. Short version: your files stay yours.",
-    termsTitle: "Terms of service — ConvertX",
-    termsDesc: "The simple terms that apply when you use ConvertX.",
-    toolPrefix: " — ConvertX",
+    privacyTitle: "Privacy policy — FConvert",
+    privacyDesc: "How FConvert handles your files and data. Short version: your files stay yours.",
+    termsTitle: "Terms of service — FConvert",
+    termsDesc: "The simple terms that apply when you use FConvert.",
+    toolPrefix: " — FConvert",
   },
 
   legal: {
@@ -370,7 +370,7 @@ const en = {
       },
       {
         heading: "No account, no profile",
-        body: "You can use ConvertX without an account. We never ask for your name or email, and we do not build profiles of you.",
+        body: "You can use FConvert without an account. We never ask for your name or email, and we do not build profiles of you.",
       },
       {
         heading: "History stays on your device",
@@ -389,12 +389,12 @@ const en = {
     termsIntro: "Simple terms for a simple tool.",
     termsItems: [
       {
-        heading: "What ConvertX is",
-        body: "ConvertX is a free online file converter. It runs real conversion engines and returns converted files to you.",
+        heading: "What FConvert is",
+        body: "FConvert is a free online file converter. It runs real conversion engines and returns converted files to you.",
       },
       {
         heading: "Acceptable use",
-        body: "Do not use ConvertX to convert content you do not have the right to process, or for anything unlawful. You are responsible for the files you upload.",
+        body: "Do not use FConvert to convert content you do not have the right to process, or for anything unlawful. You are responsible for the files you upload.",
       },
       {
         heading: "File handling",
@@ -406,11 +406,11 @@ const en = {
       },
       {
         heading: "No warranty",
-        body: "ConvertX is provided as-is, without warranty of any kind. We work hard to keep conversions accurate, but we are not liable for any loss resulting from your use of the service.",
+        body: "FConvert is provided as-is, without warranty of any kind. We work hard to keep conversions accurate, but we are not liable for any loss resulting from your use of the service.",
       },
       {
         heading: "Changes",
-        body: "We may update these terms from time to time. Continuing to use ConvertX after changes means you accept the updated terms.",
+        body: "We may update these terms from time to time. Continuing to use FConvert after changes means you accept the updated terms.",
       },
     ],
   },
@@ -419,9 +419,9 @@ const en = {
 export type Dict = typeof en;
 
 const th: Dict = {
-  brand: "ConvertX",
+  brand: "FConvert",
   tagline: "แปลงอะไรก็ได้ เก็บคุณภาพทุกอย่าง",
-  appName: "ConvertX — แปลงไฟล์ทุกประเภท",
+  appName: "FConvert — แปลงไฟล์ทุกประเภท",
 
   nav: {
     convert: "แปลงไฟล์",
@@ -758,22 +758,22 @@ const th: Dict = {
   },
 
   meta: {
-    homeTitle: "ConvertX — แปลงไฟล์ทุกอย่างในที่เดียว",
+    homeTitle: "FConvert — แปลงไฟล์ทุกอย่างในที่เดียว",
     homeDesc:
       "แปลงไฟล์ทุกประเภท เช่น รูปภาพ PDF เอกสาร เสียง และวิดีโอ ด้วยคุณภาพสูงในที่เดียว — ฟรี ไม่ต้องสมัครสมาชิก",
-    toolsTitle: "เครื่องมือแปลงไฟล์ทั้งหมด — ConvertX",
+    toolsTitle: "เครื่องมือแปลงไฟล์ทั้งหมด — FConvert",
     toolsDesc: "ค้นหาเครื่องมือแปลงไฟล์ครบทุกประเภท ทั้งรูปภาพ PDF เอกสาร เสียง และวิดีโอ ในที่เดียว",
-    historyTitle: "ประวัติการแปลงไฟล์ — ConvertX",
+    historyTitle: "ประวัติการแปลงไฟล์ — FConvert",
     historyDesc: "ประวัติการแปลงไฟล์ล่าสุดของคุณ เก็บไว้อย่างเป็นส่วนตัวบนอุปกรณ์นี้",
-    pdfTitle: "ชุดเครื่องมือ PDF — ConvertX",
+    pdfTitle: "ชุดเครื่องมือ PDF — FConvert",
     pdfDesc: "รวม แยก บีบอัด หมุน เข้ารหัส และแปลงหน้า PDF พร้อมพรีวิวทุกหน้าแบบเรียลไทม์",
-    workspaceTitle: "พื้นที่ทำงานแปลงไฟล์ — ConvertX",
+    workspaceTitle: "พื้นที่ทำงานแปลงไฟล์ — FConvert",
     workspaceDesc: "พรีวิวไฟล์ เลือกคุณภาพ และแปลงไฟล์แบบเรียลไทม์",
-    privacyTitle: "นโยบายความเป็นส่วนตัว — ConvertX",
-    privacyDesc: "ConvertX ดูแลไฟล์และข้อมูลของคุณอย่างไร ย่อสั้นคือ ไฟล์ของคุณเป็นของคุณ",
-    termsTitle: "ข้อกำหนดการใช้งาน — ConvertX",
-    termsDesc: "ข้อกำหนดง่ายๆ ที่ใช้เมื่อคุณใช้ ConvertX",
-    toolPrefix: " — ConvertX",
+    privacyTitle: "นโยบายความเป็นส่วนตัว — FConvert",
+    privacyDesc: "FConvert ดูแลไฟล์และข้อมูลของคุณอย่างไร ย่อสั้นคือ ไฟล์ของคุณเป็นของคุณ",
+    termsTitle: "ข้อกำหนดการใช้งาน — FConvert",
+    termsDesc: "ข้อกำหนดง่ายๆ ที่ใช้เมื่อคุณใช้ FConvert",
+    toolPrefix: " — FConvert",
   },
 
   legal: {
@@ -787,7 +787,7 @@ const th: Dict = {
       },
       {
         heading: "ไม่ต้องสมัครสมาชิก ไม่มีโปรไฟล์",
-        body: "คุณใช้ ConvertX ได้โดยไม่ต้องสมัครสมาชิก เราไม่เคยถามชื่อหรืออีเมล และไม่สร้างโปรไฟล์ของคุณ",
+        body: "คุณใช้ FConvert ได้โดยไม่ต้องสมัครสมาชิก เราไม่เคยถามชื่อหรืออีเมล และไม่สร้างโปรไฟล์ของคุณ",
       },
       {
         heading: "ประวัติถูกเก็บไว้บนอุปกรณ์ของคุณ",
@@ -806,12 +806,12 @@ const th: Dict = {
     termsIntro: "ข้อกำหนดง่ายๆ สำหรับเครื่องมือที่ใช้งานง่าย",
     termsItems: [
       {
-        heading: "ConvertX คืออะไร",
-        body: "ConvertX เป็นเครื่องมือแปลงไฟล์ออนไลน์ฟรี มันใช้ Conversion Engine จริงและคืนไฟล์ที่แปลงแล้วให้คุณ",
+        heading: "FConvert คืออะไร",
+        body: "FConvert เป็นเครื่องมือแปลงไฟล์ออนไลน์ฟรี มันใช้ Conversion Engine จริงและคืนไฟล์ที่แปลงแล้วให้คุณ",
       },
       {
         heading: "การใช้งานที่เหมาะสม",
-        body: "ห้ามใช้ ConvertX แปลงเนื้อหาที่คุณไม่มีสิทธิ์ประมวลผล หรือเพื่อวัตถุประสงค์ที่ผิดกฎหมาย คุณรับผิดชอบไฟล์ที่คุณอัปโหลด",
+        body: "ห้ามใช้ FConvert แปลงเนื้อหาที่คุณไม่มีสิทธิ์ประมวลผล หรือเพื่อวัตถุประสงค์ที่ผิดกฎหมาย คุณรับผิดชอบไฟล์ที่คุณอัปโหลด",
       },
       {
         heading: "การจัดการไฟล์",
@@ -823,11 +823,11 @@ const th: Dict = {
       },
       {
         heading: "ไม่มีการรับประกัน",
-        body: "ConvertX ถูกให้บริการตามสภาพโดยไม่มีการรับประกันใดๆ เราพยายามให้การแปลงแม่นยำที่สุด แต่เราไม่รับผิดชอบต่อความสูญเสียใดๆ จากการใช้บริการ",
+        body: "FConvert ถูกให้บริการตามสภาพโดยไม่มีการรับประกันใดๆ เราพยายามให้การแปลงแม่นยำที่สุด แต่เราไม่รับผิดชอบต่อความสูญเสียใดๆ จากการใช้บริการ",
       },
       {
         heading: "การเปลี่ยนแปลง",
-        body: "เราอาจอัปเดตข้อกำหนดเหล่านี้เป็นครั้งคราว การใช้งาน ConvertX ต่อภายหลังการเปลี่ยนแปลงหมายถึงการยอมรับข้อกำหนดที่อัปเดต",
+        body: "เราอาจอัปเดตข้อกำหนดเหล่านี้เป็นครั้งคราว การใช้งาน FConvert ต่อภายหลังการเปลี่ยนแปลงหมายถึงการยอมรับข้อกำหนดที่อัปเดต",
       },
     ],
   },

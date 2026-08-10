@@ -16,27 +16,27 @@ const noto = Noto_Sans_Thai({
 export const metadata: Metadata = {
   metadataBase: new URL("https://convertx.app"),
   title: {
-    default: "ConvertX — Convert every file in one place",
-    template: "%s — ConvertX",
+    default: "FConvert — Convert every file in one place",
+    template: "%s — FConvert",
   },
   description:
     "Convert every file: images, PDFs, documents, audio and video. High quality, real conversions, private by design.",
   icons: {
     icon: [
-      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/logo.jpg", type: "image/jpeg" },
       { url: "/favicon.ico", sizes: "any" },
     ],
   },
   openGraph: {
-    title: "ConvertX — Convert every file in one place",
+    title: "FConvert — Convert every file in one place",
     description:
       "Convert images, PDFs, documents, audio and video at high quality. Free, private, real conversions.",
     type: "website",
-    siteName: "ConvertX",
+    siteName: "FConvert",
   },
   twitter: {
     card: "summary_large_image",
-    title: "ConvertX — Convert every file in one place",
+    title: "FConvert — Convert every file in one place",
     description: "Real, high-quality file conversions in seconds. Private by design.",
   },
 };
