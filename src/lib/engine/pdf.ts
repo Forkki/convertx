@@ -31,7 +31,8 @@ async function isPopplerAvailable(): Promise<boolean> {
 export async function renderPdfPageAsImage(
   buffer: Buffer,
   pageNum: number,
-  dpi: number
+  dpi: number,
+  jpegQuality = 92
 ): Promise<ArrayBuffer | null> {
   if (await isPopplerAvailable()) {
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), "convertx-pdf-"));
@@ -43,7 +44,7 @@ export async function renderPdfPageAsImage(
         "-l", String(pageNum),
         "-r", String(dpi),
         "-jpeg",
-        "-jpegopt", "quality=92",
+        "-jpegopt", `quality=${jpegQuality}`,
         "-singlefile",
         input,
         path.join(dir, "page"),
@@ -63,6 +64,22 @@ export async function renderPdfPageAsImage(
     return await renderPageAsImage(proxy, pageNum, { scale: dpi / 72, canvasImport });
   } catch {
     return null;
+  }
+}
+
+async function pdfPageCountViaInfo(buffer: Buffer): Promise<number | null> {
+  if (!(await isPopplerAvailable())) return null;
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "convertx-pdf-"));
+  const input = path.join(dir, "input.pdf");
+  try {
+    fs.writeFileSync(input, buffer);
+    const { stdout } = await execFileAsync("pdfinfo", [input]);
+    const m = String(stdout).match(/^Pages:\s+(\d+)/m);
+    return m ? parseInt(m[1], 10) : null;
+  } catch {
+    return null;
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
   }
 }
 
@@ -96,14 +113,20 @@ export async function pdfToImages(
   onProgress?: ProgressCb
 ): Promise<OutputFileData[]> {
   const target = settings.target;
-  const proxy = await loadProxy(input.buffer);
-  const total = proxy.numPages;
+  const total = (await pdfPageCountViaInfo(input.buffer)) ?? (await loadProxy(input.buffer)).numPages;
   if (!total) throw new ConversionError("corrupt", "PDF has no readable pages.");
   if (total > 300) throw new ConversionError("memory", "This PDF has too many pages to render here.");
 
   const dpi = clampInt(settings.dpi, 120, 50, 600);
   const pages = parsePageRange(settings.pageRange, total);
   const quality = presetQuality(settings.quality ?? "high", settings.imageQuality, 90);
+  // Default JPEG path uses pdftoppm's output directly (no sharp re-encode),
+  // which keeps the free-tier instance from piling up pixel buffers page after page.
+  const useRawJpeg =
+    target === "jpg" &&
+    (settings.colorMode === undefined || settings.colorMode === "rgb") &&
+    settings.dpi === undefined;
+  const multiPage = pages.length > 1;
 
   const outputs: OutputFileData[] = [];
   for (let i = 0; i < pages.length; i++) {
@@ -118,7 +141,7 @@ export async function pdfToImages(
 
     let png: ArrayBuffer | null;
     try {
-      png = await renderPdfPageAsImage(input.buffer, pageNum, dpi);
+      png = await renderPdfPageAsImage(input.buffer, pageNum, dpi, useRawJpeg ? quality : 92);
     } catch (e) {
       if (String(e).includes("password") || String(e).toLowerCase().includes("encrypt")) {
         throw new ConversionError("corrupt", "This PDF is password-protected and cannot be rendered.");
@@ -127,28 +150,31 @@ export async function pdfToImages(
     }
     if (!png) throw new ConversionError("convertFailed", `Could not render page ${pageNum}.`);
 
-    let pipeline = sharp(Buffer.from(png));
-    if (settings.colorMode === "grayscale") pipeline = pipeline.grayscale();
-    if (settings.colorMode === "bw") pipeline = pipeline.threshold();
-    if (settings.dpi) pipeline = pipeline.withMetadata({ density: dpi });
-
     let buffer: Buffer;
-    switch (target) {
-      case "jpg":
-        buffer = await pipeline.jpeg({ quality, mozjpeg: true }).toBuffer();
-        break;
-      case "webp":
-        buffer = await pipeline.webp({ quality, effort: 4 }).toBuffer();
-        break;
-      case "tiff":
-        buffer = await pipeline.tiff({ quality }).toBuffer();
-        break;
-      default:
-        buffer = await pipeline.png({ compressionLevel: settings.compression === "none" ? 0 : 6 }).toBuffer();
-        break;
+    if (useRawJpeg) {
+      buffer = Buffer.from(png);
+    } else {
+      let pipeline = sharp(Buffer.from(png));
+      if (settings.colorMode === "grayscale") pipeline = pipeline.grayscale();
+      if (settings.colorMode === "bw") pipeline = pipeline.threshold();
+      if (settings.dpi) pipeline = pipeline.withMetadata({ density: dpi });
+      switch (target) {
+        case "jpg":
+          buffer = await pipeline.jpeg({ quality, mozjpeg: true }).toBuffer();
+          break;
+        case "webp":
+          buffer = await pipeline.webp({ quality, effort: 4 }).toBuffer();
+          break;
+        case "tiff":
+          buffer = await pipeline.tiff({ quality }).toBuffer();
+          break;
+        default:
+          buffer = await pipeline.png({ compressionLevel: settings.compression === "none" ? 0 : 6 }).toBuffer();
+          break;
+      }
     }
 
-    const preview = await imagePreviewSmall(buffer);
+    const preview = !multiPage ? await imagePreviewSmall(buffer) : "";
     const num = pages.length > 1 ? `-${String(pageNum).padStart(2, "0")}` : "";
     outputs.push({
       name: sanitizeOutputName(`${input.name.replace(/\.pdf$/i, "")}${num}`, target),
