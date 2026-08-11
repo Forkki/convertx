@@ -1,11 +1,70 @@
 import { PDFDocument, degrees, StandardFonts, rgb } from "pdf-lib";
 import { getDocumentProxy, renderPageAsImage, extractText } from "unpdf";
 import sharp from "sharp";
+import fs from "fs";
+import os from "os";
+import path from "path";
+import { execFile } from "child_process";
+import { promisify } from "util";
 import { sanitizeOutputName, presetQuality, parsePageRange, ConversionError, clampInt } from "./safety";
 import { mimeFor } from "./image";
 import type { ConversionSettings, OutputFileData, ProgressCb, UploadedFileData } from "./types";
 
+const execFileAsync = promisify(execFile);
 const canvasImport = () => import("@napi-rs/canvas");
+
+let popplerChecked = false;
+let popplerAvailable = false;
+
+async function isPopplerAvailable(): Promise<boolean> {
+  if (popplerChecked) return popplerAvailable;
+  try {
+    await execFileAsync("pdftoppm", ["-v"]);
+    popplerAvailable = true;
+  } catch (e) {
+    popplerAvailable = (e as NodeJS.ErrnoException)?.code !== "ENOENT";
+  }
+  popplerChecked = true;
+  return popplerAvailable;
+}
+
+export async function renderPdfPageAsImage(
+  buffer: Buffer,
+  pageNum: number,
+  dpi: number
+): Promise<ArrayBuffer | null> {
+  if (await isPopplerAvailable()) {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "convertx-pdf-"));
+    const input = path.join(dir, "input.pdf");
+    try {
+      fs.writeFileSync(input, buffer);
+      await execFileAsync("pdftoppm", [
+        "-f", String(pageNum),
+        "-l", String(pageNum),
+        "-r", String(dpi),
+        "-jpeg",
+        "-jpegopt", "quality=92",
+        "-singlefile",
+        input,
+        path.join(dir, "page"),
+      ]);
+      const file = path.join(dir, "page.jpg");
+      if (fs.existsSync(file)) return fs.readFileSync(file).buffer as ArrayBuffer;
+      return null;
+    } catch {
+      return null;
+    } finally {
+      fs.rmSync(dir, { recursive: true, force: true });
+    }
+  }
+
+  try {
+    const proxy = await getDocumentProxy(new Uint8Array(buffer));
+    return await renderPageAsImage(proxy, pageNum, { scale: dpi / 72, canvasImport });
+  } catch {
+    return null;
+  }
+}
 
 const PAGE_SIZES: Record<string, [number, number]> = {
   A4: [595.28, 841.89],
@@ -43,7 +102,6 @@ export async function pdfToImages(
   if (total > 300) throw new ConversionError("memory", "This PDF has too many pages to render here.");
 
   const dpi = clampInt(settings.dpi, 150, 50, 600);
-  const scale = dpi / 72;
   const pages = parsePageRange(settings.pageRange, total);
   const quality = presetQuality(settings.quality ?? "high", settings.imageQuality, 90);
 
@@ -58,15 +116,16 @@ export async function pdfToImages(
       total: pages.length,
     });
 
-    let png: ArrayBuffer;
+    let png: ArrayBuffer | null;
     try {
-      png = await renderPageAsImage(proxy, pageNum, { scale, canvasImport });
+      png = await renderPdfPageAsImage(input.buffer, pageNum, dpi);
     } catch (e) {
       if (String(e).includes("password") || String(e).toLowerCase().includes("encrypt")) {
         throw new ConversionError("corrupt", "This PDF is password-protected and cannot be rendered.");
       }
       throw new ConversionError("convertFailed", `Could not render page ${pageNum}.`);
     }
+    if (!png) throw new ConversionError("convertFailed", `Could not render page ${pageNum}.`);
 
     let pipeline = sharp(Buffer.from(png));
     if (settings.colorMode === "grayscale") pipeline = pipeline.grayscale();

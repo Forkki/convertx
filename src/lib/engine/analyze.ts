@@ -4,7 +4,7 @@ import path from "path";
 import sharp from "sharp";
 import ffmpegPath from "ffmpeg-static";
 import { detectFormat } from "./detect";
-import { pdfPageCount } from "./pdf";
+import { pdfPageCount, renderPdfPageAsImage } from "./pdf";
 import { imagePreview } from "./image";
 import { ConversionError } from "./safety";
 import type { Category } from "./formats";
@@ -74,13 +74,9 @@ export async function analyzeFile(id: string, name: string, buffer: Buffer): Pro
   } else if (detected.category === "pdf") {
     result.pages = await pdfPageCount(buffer);
     if (result.pages === 0) throw new ConversionError("corrupt", `${name} could not be read as a PDF.`);
-    // thumbnail preview of page 1
     try {
-      const { getDocumentProxy, renderPageAsImage } = await import("unpdf");
-      const proxy = await getDocumentProxy(new Uint8Array(buffer));
-      const canvasImport = () => import("@napi-rs/canvas");
-      const png = await renderPageAsImage(proxy, 1, { scale: 0.9, canvasImport });
-      result.preview = await imagePreview(Buffer.from(png), 460);
+      const png = await renderPdfPageAsImage(buffer, 1, 120);
+      if (png) result.preview = await imagePreview(Buffer.from(png), 460);
     } catch {
       /* preview optional */
     }

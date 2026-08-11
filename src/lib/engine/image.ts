@@ -6,6 +6,7 @@ import type { ConversionSettings, OutputFileData, ProgressCb, UploadedFileData }
 
 const PNG_COMPRESSION: Record<string, number> = { none: 0, low: 2, medium: 6, high: 9 };
 const BACKGROUND = "white";
+const MAX_INPUT_PIXELS = 134_000_000;
 
 export function mimeFor(ext: string): string {
   const map: Record<string, string> = {
@@ -33,10 +34,13 @@ export async function convertImage(
 
   onProgress?.({ phase: "analyzing", label: "Reading image…", pct: 5 });
 
-  let pipeline = sharp(input.buffer);
+  let pipeline = sharp(input.buffer, { limitInputPixels: MAX_INPUT_PIXELS }).autoOrient();
 
   const meta = await pipeline.metadata().catch(() => null);
   if (!meta) throw new ConversionError("corrupt", `${input.name} could not be read as an image.`);
+  if (meta.width && meta.height && meta.width * meta.height > MAX_INPUT_PIXELS) {
+    throw new ConversionError("fileTooBig", `${input.name} is too large to process here (max ${Math.round(MAX_INPUT_PIXELS / 1e6)} megapixels).`);
+  }
 
   const quality = presetQuality(settings.quality ?? "high", settings.imageQuality, 88);
 
@@ -108,10 +112,11 @@ export async function convertImage(
 
 export async function imagePreview(buffer: Buffer, maxDim = 520): Promise<string> {
   try {
-    const { width, height } = await sharp(buffer).metadata();
+    const { width, height } = await sharp(buffer, { limitInputPixels: MAX_INPUT_PIXELS }).metadata();
     if (!width || !height) return "";
     const scale = Math.min(1, maxDim / Math.max(width, height));
-    const resized = await sharp(buffer)
+    const resized = await sharp(buffer, { limitInputPixels: MAX_INPUT_PIXELS })
+      .autoOrient()
       .resize({ width: Math.round(width * scale), height: Math.round(height * scale) })
       .jpeg({ quality: 80, progressive: true })
       .toBuffer();
