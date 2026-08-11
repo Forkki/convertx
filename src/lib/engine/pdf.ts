@@ -101,7 +101,7 @@ export async function pdfToImages(
   if (!total) throw new ConversionError("corrupt", "PDF has no readable pages.");
   if (total > 300) throw new ConversionError("memory", "This PDF has too many pages to render here.");
 
-  const dpi = clampInt(settings.dpi, 150, 50, 600);
+  const dpi = clampInt(settings.dpi, 120, 50, 600);
   const pages = parsePageRange(settings.pageRange, total);
   const quality = presetQuality(settings.quality ?? "high", settings.imageQuality, 90);
 

@@ -197,9 +197,9 @@ export function SettingsPanel() {
             <div className="space-y-4 pt-2">
               <Select
                 label={t.workspace.dpi}
-                value={String(settings.dpi ?? 150)}
+                value={String(settings.dpi ?? 120)}
                 onChange={(v) => updateSettings({ dpi: Number(v) })}
-                options={["96", "150", "200", "300", "400", "600"].map((d) => ({ value: d, label: `${d} DPI` }))}
+                options={["96", "120", "150", "200", "300", "400", "600"].map((d) => ({ value: d, label: `${d} DPI` }))}
               />
               <TextField
                 label={t.workspace.pageRange}

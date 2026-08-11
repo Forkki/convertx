@@ -14,6 +14,10 @@ export const maxDuration = 300;
 
 const encoder = new TextEncoder();
 
+const ZIP_SKIP_BYTES = 60 * 1024 * 1024; // skip the duplicate zip buffer above this
+const RESULT_CHUNK = 20; // outputs per result event
+const MAX_OUTPUT_BYTES = 80 * 1024 * 1024; // base64 cap per single output event
+
 function ndjsonStream(job: ConvertJob, baseZipName: string): ReadableStream<Uint8Array> {
   return new ReadableStream<Uint8Array>({
     async start(controller) {
@@ -28,29 +32,45 @@ function ndjsonStream(job: ConvertJob, baseZipName: string): ReadableStream<Uint
 
         const outputs = await runConversion(job, onProgress);
 
-        const zip =
-          outputs.length > 1
-            ? await zipOutputs(outputs, baseZipName || "convertx")
-            : undefined;
-
-        send({
-          type: "result",
-          outputs: outputs.map((o) => ({
+        // Stream results in small chunks so the base64 payload is never materialized
+        // as one giant buffer (keeps the free-tier instance under its memory limit).
+        const totalBytes = outputs.reduce((s, o) => s + o.buffer.length, 0);
+        for (let i = 0; i < outputs.length; i += RESULT_CHUNK) {
+          const chunk = outputs.slice(i, i + RESULT_CHUNK);
+          const payload = chunk.map((o) => ({
             name: sanitizeFilename(o.name),
             mime: o.mime,
             size: o.buffer.length,
             preview: o.preview,
             data: o.buffer.toString("base64"),
-          })),
-          zip: zip
-            ? {
-                name: sanitizeFilename(zip.name),
-                mime: zip.mime,
-                size: zip.buffer.length,
-                data: zip.buffer.toString("base64"),
-              }
-            : undefined,
-        });
+          }));
+          const oversized = payload.find((p) => p.data.length > MAX_OUTPUT_BYTES);
+          if (oversized) {
+            throw new ConversionError(
+              "memory",
+              `${oversized.name} is too large to send back. Try a lower DPI/quality.`
+            );
+          }
+          send({ type: "result", outputs: payload });
+        }
+
+        const zip =
+          outputs.length > 1 && totalBytes <= ZIP_SKIP_BYTES
+            ? await zipOutputs(outputs, baseZipName || "convertx")
+            : undefined;
+
+        if (zip) {
+          send({
+            type: "result",
+            outputs: [],
+            zip: {
+              name: sanitizeFilename(zip.name),
+              mime: zip.mime,
+              size: zip.buffer.length,
+              data: zip.buffer.toString("base64"),
+            },
+          });
+        }
       } catch (e) {
         console.error("[convert] conversion error:", e);
         const err = e instanceof ConversionError ? e : new ConversionError("server", "Unexpected server error.");

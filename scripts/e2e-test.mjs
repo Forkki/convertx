@@ -88,7 +88,10 @@ async function postConvert(files, toolId, target, settings = {}) {
   const res = await fetch(`${BASE}/api/convert`, { method: "POST", body: fd });
   const text = await res.text();
   const lines = text.split("\n").filter(Boolean).map((l) => JSON.parse(l));
-  const result = lines.find((l) => l.type === "result");
+  const resultLines = lines.filter((l) => l.type === "result");
+  const result = resultLines.length
+    ? { outputs: resultLines.flatMap((r) => r.outputs), zip: resultLines.map((r) => r.zip).find(Boolean) }
+    : undefined;
   const error = lines.find((l) => l.type === "error");
   return { status: res.status, lines, result, error };
 }

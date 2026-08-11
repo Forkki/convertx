@@ -76,7 +76,7 @@ export const defaultSettings = (): ConversionSettings => ({
   quality: "high",
   imageQuality: 90,
   keepMetadata: false,
-  dpi: 150,
+  dpi: 120,
   pageRange: "",
   colorMode: "rgb",
   compression: "medium",
@@ -287,7 +287,7 @@ export async function startConversion() {
     files: state.files.map((f) => ({ ...f, status: "converting" as const })),
   });
 
-  let payloadOutputs: OutputPayload[] = [];
+  const payloadOutputs: OutputPayload[] = [];
   let payloadZip: OutputPayload | undefined;
 
   try {
@@ -315,8 +315,8 @@ export async function startConversion() {
             },
           });
         } else if (evt.type === "result") {
-          payloadOutputs = evt.outputs;
-          payloadZip = evt.zip;
+          payloadOutputs.push(...evt.outputs);
+          if (evt.zip) payloadZip = evt.zip;
         }
       },
       signal
